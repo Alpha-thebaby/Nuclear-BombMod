@@ -1,0 +1,21 @@
+{
+	"variants": {
+			"tex=0": { "model": "hbm:taint_0"},
+			"tex=1": { "model": "hbm:taint_1"},
+			"tex=2": { "model": "hbm:taint_2"},
+			"tex=3": { "model": "hbm:taint_3"},
+			"tex=4": { "model": "hbm:taint_4"},
+			"tex=5": { "model": "hbm:taint_5"},
+			"tex=6": { "model": "hbm:taint_6"},
+			"tex=7": { "model": "hbm:taint_7"},
+			"tex=8": { "model": "hbm:taint_8"},
+			"tex=9": { "model": "hbm:taint_9"},
+			"tex=10": { "model": "hbm:taint_10"},
+			"tex=11": { "model": "hbm:taint_11"},
+			"tex=12": { "model": "hbm:taint_12"},
+			"tex=13": { "model": "hbm:taint_13"},
+			"tex=14": { "model": "hbm:taint_14"},
+			"tex=15": { "model": "hbm:taint_15"}
+		
+	}
+}

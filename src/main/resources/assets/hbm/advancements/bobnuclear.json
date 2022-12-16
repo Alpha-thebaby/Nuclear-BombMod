@@ -1,0 +1,19 @@
+{
+	"display": {
+		"icon": {
+			"item": "hbm:bob_nuclear"
+		},
+		"title": {
+			"translate": "hbm.achievement.nuclear"
+		},
+		"description": {
+			"translate": "hbm.achievement.nuclear.desc"
+		}
+	},
+	"parent": "hbm:boboil",
+	"criteria": {
+		"impossible": {
+			"trigger": "minecraft:impossible"
+		}
+	}
+}

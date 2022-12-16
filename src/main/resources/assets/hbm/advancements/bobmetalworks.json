@@ -1,0 +1,19 @@
+{
+	"display": {
+		"icon": {
+			"item": "hbm:bob_metalworks"
+		},
+		"title": {
+			"translate": "hbm.achievement.metalworks"
+		},
+		"description": {
+			"translate": "hbm.achievement.metalworks.desc"
+		}
+	},
+	"parent": "hbm:root",
+	"criteria": {
+		"impossible": {
+			"trigger": "minecraft:impossible"
+		}
+	}
+}

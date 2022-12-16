@@ -1,0 +1,19 @@
+{
+	"display": {
+		"icon": {
+			"item": "hbm:bob_oil"
+		},
+		"title": {
+			"translate": "hbm.achievement.oil"
+		},
+		"description": {
+			"translate": "hbm.achievement.oil.desc"
+		}
+	},
+	"parent": "hbm:bobchemistry",
+	"criteria": {
+		"impossible": {
+			"trigger": "minecraft:impossible"
+		}
+	}
+}
