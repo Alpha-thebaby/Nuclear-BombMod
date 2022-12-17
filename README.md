@@ -1,9 +1,3 @@
-1.12.2 port of the HBM's Nuclear Tech mod for minecraft 1.7.10. If you've somehow found this page and want to try the latest version, put a comment here or message me on Discord (Discord username is Drillgon200#0288) and I'll make a build and upload it.
-
-# Hbm-s-Nuclear-Tech-GIT
-
-https://minecraft.curseforge.com/projects/hbms-nuclear-tech-mod?gameCategorySlug=mc-mods&projectID=235439
-
 ## Installation Instructions
 Tired of waiting until the next version comes out? Here is a tutorial on how to compile the very newest version yourself:
 1. Download the forge 1.12.2 latest mdk and put it in a new folder
