@@ -1,8 +1,0 @@
-{
-	"parent": "block/orientable",
-	"textures": {
-		"top": "hbm:blocks/brick_concrete",
-		"front": "hbm:blocks/reactor_ejector",
-		"side": "hbm:blocks/brick_concrete"
-	}
-}

@@ -1,8 +1,0 @@
-{
-	"parent": "block/orientable",
-	"textures": {
-		"front": "hbm:blocks/factory_advanced_furnace",
-		"top": "hbm:blocks/factory_advanced_hull",
-		"side": "hbm:blocks/factory_advanced_hull"
-	}
-}

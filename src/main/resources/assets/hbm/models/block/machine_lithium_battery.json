@@ -1,8 +1,0 @@
-{
-	"parent": "block/orientable",
-	"textures": {
-		"top": "hbm:blocks/battery_lithium_top",
-		"front": "hbm:blocks/battery_lithium_front",
-		"side": "hbm:blocks/battery_lithium_side"
-	}
-}

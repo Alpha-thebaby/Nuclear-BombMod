@@ -1,8 +1,0 @@
-{
-	"parent": "block/cube_bottom_top",
-	"textures": {
-		"top": "hbm:blocks/machine_geo_top",
-		"bottom": "hbm:blocks/machine_geo_top",
-		"side": "hbm:blocks/machine_geo_side"
-	}
-}

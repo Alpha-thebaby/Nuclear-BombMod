@@ -1,7 +1,0 @@
-{
-    "parent": "block/cube_column",
-    "textures": {
-        "end": "hbm:blocks/pink_log",
-        "side": "blocks/log_oak"
-    }
-}

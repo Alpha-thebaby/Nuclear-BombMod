@@ -1,7 +1,0 @@
-{
-	"parent": "block/cube_column",
-	"textures": {
-		"end": "hbm:blocks/block_combine_steel",
-		"side": "hbm:blocks/fwatz_conductor_side"
-	}
-}

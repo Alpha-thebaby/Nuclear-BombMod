@@ -1,7 +1,0 @@
-{
-	"parent": "block/cube_column",
-	"textures": {
-		"end": "hbm:blocks/meteor_pillar_top",
-		"side": "hbm:blocks/meteor_pillar"
-	}
-}

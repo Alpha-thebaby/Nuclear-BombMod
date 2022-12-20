@@ -1,7 +1,0 @@
-{
-    "parent": "hbm:block/fire_up_alt",
-    "textures": {
-        "particle": "hbm:blocks/balefire",
-        "fire": "hbm:blocks/balefire"
-    }
-}

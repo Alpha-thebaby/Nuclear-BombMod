@@ -1,8 +1,0 @@
-{
-	"parent": "block/cube_bottom_top",
-	"textures": {
-		"top": "hbm:blocks/mush_block_inside",
-		"bottom": "hbm:blocks/mush_block_inside",
-		"side": "hbm:blocks/mush_block_stem"
-	}
-}

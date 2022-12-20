@@ -1,66 +1,82 @@
 package com.hbm.entity.effect;
 
+import com.hbm.interfaces.IConstantRenderer;
+import com.hbm.util.Vec3;
+import net.fabricmc.api.Environment;
+import net.minecraft.entity.AreaEffectCloudEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.MixinEnvironment;
+
 import java.util.ArrayList;
 
-import com.hbm.interfaces.IConstantRenderer;
-import com.hbm.render.amlfrom1710.Vec3;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.datasync.DataParameter;
-import net.minecraft.network.datasync.DataSerializers;
-import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-
 public class EntityNukeCloudSmall extends Entity implements IConstantRenderer {
-	// 16
-	private static final DataParameter<Integer> AGE = EntityDataManager.createKey(EntityNukeCloudSmall.class,
-			DataSerializers.VARINT);
-	// 17
-	private static final DataParameter<Integer> MAXAGE = EntityDataManager.createKey(EntityNukeCloudSmall.class,
-			DataSerializers.VARINT);
-	// 18
-	public static final DataParameter<Float> SCALE = EntityDataManager.createKey(EntityNukeCloudSmall.class,
-			DataSerializers.FLOAT);
-	// I really don't know. Some documentation would have been nice
-	// 19
-	public static final DataParameter<Byte> TYPE = EntityDataManager.createKey(EntityNukeCloudSmall.class,
-			DataSerializers.BYTE);
-	public int maxAge = 1000;
-	public int age;
-	public static int cloudletLife = 50;
-	public ArrayList<Cloudlet> cloudlets = new ArrayList<>();
+    // 16
+    private static final TrackedData<Integer> AGE = DataTracker.registerData(EntityNukeCloudSmall.class,
+            TrackedDataHandlerRegistry.INTEGER);
+    // 17
+    private static final TrackedData<Integer> MAXAGE = DataTracker.registerData(EntityNukeCloudSmall.class,
+            TrackedDataHandlerRegistry.INTEGER);
+    // 18
+    public static final TrackedData<Float> SCALE = DataTracker.registerData(EntityNukeCloudSmall.class,
+            TrackedDataHandlerRegistry.FLOAT);
+    // I really don't know. Some documentation would have been nice
+    // 19
+    public static final TrackedData<Byte> TYPE = DataTracker.registerData(EntityNukeCloudSmall.class,
+            TrackedDataHandlerRegistry.BYTE);
+    public int maxAge = 1000;
+    public int age;
+    public static int cloudletLife = 50;
+    public ArrayList<Cloudlet> cloudlets = new ArrayList<>();
 
-	public EntityNukeCloudSmall(World p_i1582_1_) {
-		super(p_i1582_1_);
-		this.setSize(20, 40);
-		this.ignoreFrustumCheck = true;
-		this.isImmuneToFire = true;
-		this.age = 0;
-		this.noClip = true;
-	}
+    protected void initDataTracker() {
+        this.getDataTracker().startTracking(AGE, 0);
+        this.getDataTracker().startTracking(MAXAGE, 0);
+        this.getDataTracker().startTracking(SCALE, 1.0F);
+        this.getDataTracker().startTracking(TYPE, (byte)0);
+    }
 
-	public EntityNukeCloudSmall(World p_i1582_1_, int maxAge, float scale) {
-		super(p_i1582_1_);
-		this.setSize(20, 40);
-		this.isImmuneToFire = true;
-		this.maxAge = maxAge;
-		this.dataManager.set(SCALE, scale);
-		this.noClip = true;
-	}
+    public EntityNukeCloudSmall(EntityType<? extends EntityNukeCloudSmall> entityType, World world) {
+        super(entityType, world);
+        // these are set in entity registry
+        //this.scale(20, 40);
+        //this.isImmuneToFire = true;
+        this.ignoreCameraFrustum = true;
+        this.age = 0;
+        this.noClip = true;
+        setRenderDistanceMultiplier(5.0D);
+    }
 
-	@Override
-	public void onUpdate() {
-		this.age++;
-		world.setLastLightningBolt(2);
+    public EntityNukeCloudSmall(EntityType<? extends EntityNukeCloudSmall> entityType, World world, int maxAge, float scale) {
+        super(entityType, world);
+        // these are set in entity registry
+        //this.setSize(20, 40);
+        //this.isImmuneToFire = true;
+        this.ignoreCameraFrustum = true;
+        this.age = 0;
+        this.maxAge = maxAge;
+        this.dataTracker.set(SCALE, scale);
+        this.noClip = true;
+        setRenderDistanceMultiplier(5.0D);
+    }
 
-		if (this.age >= this.maxAge) {
-			this.age = 0;
-			this.setDead();
-		}
-		int cloudCount = age * 3;
+    @Override
+    public void tick() {
+        super.tick();
+        this.age++;
+        world.setLightningTicksLeft(2);
+
+        if (this.age >= this.maxAge) {
+            this.age = 0;
+            this.discard();
+        }
+        int cloudCount = age * 3;
 
         Vec3 vec = Vec3.createVectorHelper(age * 2, 0, 0);
 
@@ -68,96 +84,78 @@ public class EntityNukeCloudSmall extends Entity implements IConstantRenderer {
 
         for(int i = 0; i < this.cloudlets.size(); i++) {
 
-        	if(age > cloudlets.get(i).age + cloudletLife)
-        		toRem = i;
-        	else
-        		break;
+            if(age > cloudlets.get(i).age + cloudletLife)
+                toRem = i;
+            else
+                break;
         }
 
         for(int i = 0; i < toRem; i++)
-        	this.cloudlets.remove(0);
+            this.cloudlets.remove(0);
 
         if(age < 200) {
-	        for(int i = 0; i < cloudCount; i++) {
-	        	vec.rotateAroundY((float)(Math.PI * 2 * world.rand.nextDouble()));
+            for(int i = 0; i < cloudCount; i++) {
+                vec.rotateAroundY((float)(Math.PI * 2 * world.random.nextDouble()));
 
-	        	this.cloudlets.add(new Cloudlet(vec.xCoord, world.getHeight((int) (vec.xCoord + posX), (int) (vec.zCoord + posZ)), vec.zCoord, age));
-	        }
+                this.cloudlets.add(new Cloudlet(vec.xCoord, world.getHeight(), vec.zCoord, age));
+            }
         }
 
-		this.dataManager.set(MAXAGE, maxAge);
-		this.dataManager.set(AGE, age);
-	}
+        this.dataTracker.set(MAXAGE, maxAge);
+        this.dataTracker.set(AGE, age);
+    }
 
-	@Override
-	protected void entityInit() {
-		this.dataManager.register(MAXAGE, maxAge);
-		this.dataManager.register(AGE, age);
-		this.dataManager.register(SCALE, 1.0F);
-		this.dataManager.register(TYPE, Byte.valueOf((byte) 0));
-	}
 
-	@Override
-	protected void readEntityFromNBT(NBTTagCompound nbt) {
-		if (nbt.hasKey("maxAge"))
-			maxAge = nbt.getShort("maxAge");
-		if (nbt.hasKey("age"))
-			age = nbt.getShort("age");
-		if (nbt.hasKey("scale"))
-			this.dataManager.set(SCALE, nbt.getFloat("scale"));
-		if(nbt.hasKey("type"))
-			this.dataManager.set(TYPE, nbt.getByte("type"));
-	}
+    @Override
+    protected void readCustomDataFromNbt(NbtCompound nbt) {
+        if (nbt.contains("maxAge"))
+            maxAge = nbt.getShort("maxAge");
+        if (nbt.contains("age"))
+            age = nbt.getShort("age");
+        if (nbt.contains("scale"))
+            this.dataTracker.set(SCALE, nbt.getFloat("scale"));
+        if(nbt.contains("type"))
+            this.dataTracker.set(TYPE, nbt.getByte("type"));
+    }
 
-	@Override
-	protected void writeEntityToNBT(NBTTagCompound p_70014_1_) {
-		p_70014_1_.setShort("maxAge", (short) maxAge);
-		p_70014_1_.setShort("age", (short) age);
-		p_70014_1_.setFloat("scale", this.dataManager.get(SCALE));
-		p_70014_1_.setByte("type", this.dataManager.get(TYPE));
-	}
+    @Override
+    protected void writeCustomDataToNbt(NbtCompound nbt) {
+        nbt.putShort("maxAge", (short) maxAge);
+        nbt.putShort("age", (short) age);
+        nbt.putFloat("scale", this.dataTracker.get(SCALE));
+        nbt.putByte("type", this.dataTracker.get(TYPE));
+    }
 
-	public static EntityNukeCloudSmall statFac(World world, double x, double y, double z, float radius) {
+    public static EntityNukeCloudSmall statFac(EntityType<EntityNukeCloudSmall> entity, World world, double x, double y, double z, float radius) {
+        EntityNukeCloudSmall cloud = new EntityNukeCloudSmall(entity, world, (int) radius * 5, radius * 0.005F);
+        cloud.setPos(x, y, z);
+        cloud.dataTracker.set(TYPE, (byte) 0);
 
-		EntityNukeCloudSmall cloud = new EntityNukeCloudSmall(world, (int) radius * 5, radius * 0.005F);
-		cloud.posX = x;
-		cloud.posY = y;
-		cloud.posZ = z;
-		cloud.dataManager.set(TYPE, (byte) 0);
+        return cloud;
+    }
 
-		return cloud;
-	}
+    public static EntityNukeCloudSmall statFacBale(EntityType<EntityNukeCloudSmall> entity, World world, double x, double y, double z, float radius,
+                                                   int maxAge) {
 
-	public static EntityNukeCloudSmall statFacBale(World world, double x, double y, double z, float radius,
-			int maxAge) {
+        EntityNukeCloudSmall cloud = new EntityNukeCloudSmall(entity, world, (int) radius * 5, radius * 0.005F);
+        cloud.setPos(x, y, z);
+        cloud.dataTracker.set(TYPE, (byte) 1);
 
-		EntityNukeCloudSmall cloud = new EntityNukeCloudSmall(world, (int) radius * 5, radius * 0.005F);
-		cloud.posX = x;
-		cloud.posY = y;
-		cloud.posZ = z;
-		cloud.dataManager.set(TYPE, (byte) 1);
+        return cloud;
+    }
 
-		return cloud;
-	}
+    public static class Cloudlet {
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public boolean isInRangeToRenderDist(double distance) {
-		return distance < 25000;
-	}
-	
-	public static class Cloudlet {
+        public double posX;
+        public double posY;
+        public double posZ;
+        public int age;
 
-    	public double posX;
-    	public double posY;
-    	public double posZ;
-    	public int age;
-
-    	public Cloudlet(double posX, double posY, double posZ, int age) {
-    		this.posX = posX;
-    		this.posY = posY;
-    		this.posZ = posZ;
-    		this.age = age;
-    	}
+        public Cloudlet(double posX, double posY, double posZ, int age) {
+            this.posX = posX;
+            this.posY = posY;
+            this.posZ = posZ;
+            this.age = age;
+        }
     }
 }
