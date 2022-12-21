@@ -1,4 +1,4 @@
-# Fabric Example Mod
+# Nuclear Bomb Mod
 
 ## Setup
 
