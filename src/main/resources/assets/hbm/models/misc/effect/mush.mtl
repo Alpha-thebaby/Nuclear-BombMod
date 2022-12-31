@@ -1,0 +1,3 @@
+newmtl magma
+emissive true
+texture minecraft:block/magma

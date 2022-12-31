@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "hbm",
   "version": "${version}",
 
   "name": "Example Mod",
@@ -14,10 +14,13 @@
   },
 
   "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/hbm/icon.png",
 
   "environment": "*",
   "entrypoints": {
+    "client": [
+      "com.hbm.client.NukeBombClient"
+    ],
     "main": [
       "com.hbm.ExampleMod"
     ]

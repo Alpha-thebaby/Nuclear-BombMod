@@ -1,47 +1,106 @@
 package com.hbm.client.render;
 
+import com.hbm.ExampleMod;
 import com.hbm.entity.effect.EntityNukeCloudSmall;
+import com.hbm.util.ObjModelHelper;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.ultreon.mods.myron.api.Myron;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.*;
+import net.minecraft.client.render.block.BlockModelRenderer;
+import net.minecraft.client.render.block.BlockRenderManager;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.model.BakedModelManager;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.resource.ResourceManager;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RotationAxis;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.random.Random;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.system.MemoryStack;
+
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.Arrays;
 
 import static com.mojang.blaze3d.systems.RenderSystem.bindTexture;
 
 public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloudSmall> {
     public static final EntityRendererFactory<EntityNukeCloudSmall> FACTORY = man -> new NukeCloudSmallEntityRenderer(man);
 
-    private static final Identifier MUSH = new Identifier("hbm", "models/effect/mush");
-    private static final Identifier SHOCKWAVE = new Identifier("hbm", "models/effect/ring_roller");
-    private static final Identifier THINRING = new Identifier("hbm", "models/effect/ring_thin");
+    private static final Identifier MUSH = new Identifier("hbm", "models/misc/effect/mush");
+    private static final Identifier SHOCKWAVE = new Identifier("hbm", "models/misc/effect/ring_roller");
+    private static final Identifier THINRING = new Identifier("hbm", "models/misc/effect/ring_thin");
 
-    BakedModel mush = Myron.getModel(MUSH);
-    BakedModel shockwave = Myron.getModel(SHOCKWAVE);
-    BakedModel thinring = Myron.getModel(THINRING);
+
+
+    Random random = Random.create();
     private static final Identifier cloudlet = new Identifier("hbm" + ":textures/particle/particle_base.png");
 
     public NukeCloudSmallEntityRenderer(EntityRendererFactory.Context context) {
         super(context);
     }
-    
-    public void render(EntityNukeCloudSmall cloud, double x, double y, double z, float entityYaw, float partialTicks) {
-        GL11.glPushMatrix();
-        GL11.glTranslated(x, y, z);
 
-        mushWrapper(cloud, partialTicks);
-        cloudletWrapper(cloud, partialTicks);
-        flashWrapper(cloud, partialTicks);
+    public void render(EntityNukeCloudSmall cloud, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        //GL11.glPushMatrix();
+        //GL11.glTranslated(x, y, z);
+        //ExampleMod.LOGGER.info("Getting models");
+        BakedModel mush = Myron.getModel(MUSH);
+        BakedModel shockwave = Myron.getModel(SHOCKWAVE);
+        BakedModel thinring = Myron.getModel(THINRING);
 
-        GL11.glPopMatrix();
+        if (mush != null) {
+            //ExampleMod.LOGGER.info("Rendering mushroom");
+            matrices.push();
+            //matrices.translate(cloud.getX(), cloud.getY(), cloud.getZ());
+            MatrixStack.Entry entry = matrices.peek();
+            VertexConsumer consumer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+            // scrolling texture
+            //matrices.translate(0, -(cloud.age) * 0.035, 0);
+
+            Vector4f quads = entry.getPositionMatrix().transform(new Vector4f(0F, 0F, 0F, 0F));
+            Vector3f normal = entry.getNormalMatrix().transform(new Vector3f(0F, 0F, 0F));
+            //m = byteBuffer.getFloat(16);
+            mush.getQuads(null, null, cloud.getWorld().random).forEach(quad -> {
+                consumer.quad(entry, quad, 1F, 1F, 1F, light, 0);
+                /*
+                    float m = 0;
+                    float n = 0;
+                    ExampleMod.LOGGER.info(Arrays.toString(quad.getVertexData()));
+                    for (int l = 0; l < 4; l++) {
+                        consumer.vertex(
+                                Float.intBitsToFloat(quad.getVertexData()[l * 8]),
+                                Float.intBitsToFloat(quad.getVertexData()[l * 8 + 1]),
+                                Float.intBitsToFloat(quad.getVertexData()[l * 8 + 2]),
+                                1F, 1F, 1F, 1.0F,
+                                m, (float) (n - (cloud.age) * 0.035),
+                                0, light,
+                                normal.x, normal.y, normal.z);
+                    }
+                 */
+                });
+            matrices.pop();
+        }
+
+        //(cloud, partialTicks);
+        //cloudletWrapper(cloud, partialTicks);
+        flashWrapper(cloud, 0, matrices, vertexConsumers);
+
+        //GL11.glPopMatrix();
     }
+
+    // Most of the code below this method doesn't actually run.
+    // It's just a hold-over from the original code to help me work out the porting.
+    // - Random
 
     @Override
     public Identifier getTexture(EntityNukeCloudSmall entity) {
@@ -62,11 +121,10 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
      * @param cloud
      * @param interp
      */
-    private void flashWrapper(EntityNukeCloudSmall cloud, float interp) {
+    private void flashWrapper(EntityNukeCloudSmall cloud, float interp, MatrixStack matrices, VertexConsumerProvider vertices) {
 
         if(cloud.age < 60) {
-
-            GL11.glPushMatrix();
+            matrices.push();
             //Function [0, 1] that determines the scale and intensity (inverse!) of the flash
             double scale = (cloud.age + interp) / 60D;
             //GlStateManager.alphaFunc(GL11.GL_GREATER, 0.0F);
@@ -75,9 +133,9 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
             //Makes it start fast and the fade-out is nice and smooth
             scale = scale * Math.pow(Math.E, -scale) * 2.717391304D;
 
-            renderFlash(scale);
+            renderFlash(scale, matrices, vertices);
             //GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
-            GL11.glPopMatrix();
+            matrices.pop();
         }
     }
 
@@ -184,11 +242,11 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
         GlStateManager.depthMask(false);
          */
 
-        bindTexture(cloudlet);
+        //bindTexture(cloudlet);
 
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder buf = tess.getBuffer();
-        buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+        buf.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
 
         for(EntityNukeCloudSmall.Cloudlet cloudlet : cloud.cloudlets) {
             float scale = cloud.age + interp - cloudlet.age;
@@ -229,59 +287,64 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
      * WE CAN MAKE IT 16  - Random
      * @param intensity Double [0, 1] that determines scale and alpha
      */
-    private void renderFlash(double intensity) {
+    private void renderFlash(double intensity, MatrixStack matrices, VertexConsumerProvider vertices) {
 
-        GL11.glScalef(0.2F, 0.2F, 0.2F);
+        //GL11.glScalef(0.2F, 0.2F, 0.2F);
 
         double inverse = 1.0D - intensity;
 
-        net.minecraft.client.render.Tessellator tessellator = net.minecraft.client.render.Tessellator.getInstance();
-        BufferBuilder buf = tessellator.getBuffer();
+        //net.minecraft.client.render.Tessellator tessellator = net.minecraft.client.render.Tessellator.getInstance();
+        //BufferBuilder buf = tessellator.getBuffer();
+
+        VertexConsumer buf = vertices.getBuffer(RenderLayer.getLightning());
         //RenderHelper.disableStandardItemLighting();
 
         //new Random(432L)
         Random random = Random.create(432L);
-        GlStateManager._disableTexture();
+        //GlStateManager._disableTexture();
         //GlStateManager._shadeModel(GL11.GL_SMOOTH);
-        GlStateManager._enableBlend();
+        //GlStateManager._enableBlend();
         //GlStateManager._blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE);
         //GlStateManager._disableAlpha();
-        GlStateManager._enableCull();
-        GlStateManager._depthMask(false);
+        //GlStateManager._enableCull();
+        //GlStateManager._depthMask(false);
 
-        GL11.glPushMatrix();
+        matrices.push();
 
         float scale = 100;
 
         for(int i = 0; i < 300; i++) {
 
-            GL11.glRotatef(random.nextFloat() * 360.0F, 1.0F, 0.0F, 0.0F);
-            GL11.glRotatef(random.nextFloat() * 360.0F, 0.0F, 1.0F, 0.0F);
-            GL11.glRotatef(random.nextFloat() * 360.0F, 0.0F, 0.0F, 1.0F);
-            GL11.glRotatef(random.nextFloat() * 360.0F, 1.0F, 0.0F, 0.0F);
-            GL11.glRotatef(random.nextFloat() * 360.0F, 0.0F, 1.0F, 0.0F);
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(random.nextFloat() * 360.0F));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(random.nextFloat() * 360.0F));
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(random.nextFloat() * 360.0F));
+            matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(random.nextFloat() * 360.0F));
+            matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(random.nextFloat() * 360.0F));
+            matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(random.nextFloat() * 360.0F));
 
             float vert1 = (random.nextFloat() * 20.0F + 5.0F + 1 * 10.0F) * (float)(intensity * scale);
             float vert2 = (random.nextFloat() * 2.0F + 1.0F + 1 * 2.0F) * (float)(intensity * scale);
+            Matrix4f matrix4f = matrices.peek().getPositionMatrix();
 
             //buf.begin(GL11.GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION_COLOR);
             //.endVertex()
-            buf.vertex(0, 0, 0).color(1.0F, 1.0F, 1.0F, (float) inverse);
-            buf.vertex(-0.866D * vert2, vert1, -0.5F * vert2).color(1.0F, 1.0F, 1.0F, 0.0F);
-            buf.vertex(0.866D * vert2, vert1, -0.5F * vert2).color(1.0F, 1.0F, 1.0F, 0.0F);
-            buf.vertex(0.0D, vert1, 1.0F * vert2).color(1.0F, 1.0F, 1.0F, 0.0F);
-            buf.vertex(-0.866D * vert2, vert1, -0.5F * vert2).color(1.0F, 1.0F, 1.0F, 0.0F);
-            tessellator.draw();
+            buf.vertex(matrix4f, 0, 0, 0).color(1.0F, 1.0F, 1.0F, (float) intensity).next();
+            buf.vertex(matrix4f, (float) (-0.866D * vert2), vert1, -0.5F * vert2).color(1.0F, 1.0F, 1.0F, 0.0F).next();
+            buf.vertex(matrix4f, (float) (0.866D * vert2), vert1, -0.5F * vert2).color(1.0F, 1.0F, 1.0F, 0.0F).next();
+            buf.vertex(matrix4f, 0.0F, vert1, vert2).color(1.0F, 1.0F, 1.0F, 0.0F).next();
+            buf.vertex(matrix4f, (float) (-0.866D * vert2), vert1, -0.5F * vert2).color(1.0F, 1.0F, 1.0F, 0.0F).next();
+
         }
 
-        GL11.glPopMatrix();
+        //GL11.glPopMatrix();
+        matrices.pop();
 
-        GlStateManager._depthMask(true);
-        GlStateManager._disableCull();
-        GlStateManager._disableBlend();
+        //GlStateManager._depthMask(true);
+        //GlStateManager._disableCull();
+        //GlStateManager._disableBlend();
         //GlStateManager.shadeModel(GL11.GL_FLAT);
-        GlStateManager._clearColor(1, 1, 1, 1);
-        GlStateManager._enableTexture();
+        //GlStateManager._clearColor(1, 1, 1, 1);
+        //GlStateManager._enableTexture();
         //GlStateManager._enableAlpha();
         //RenderHelper.enableStandardItemLighting();
     }
@@ -305,7 +368,7 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
 
         GL11.glShadeModel(GL11.GL_SMOOTH);
         GL11.glDisable(GL11.GL_ALPHA_TEST);
-        mush.renderPart("Ball");
+        //mush.renderPart("Ball");
         GL11.glEnable(GL11.GL_ALPHA_TEST);
         GL11.glShadeModel(GL11.GL_FLAT);
 
@@ -326,7 +389,7 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
 
         GL11.glShadeModel(GL11.GL_SMOOTH);
         GL11.glDisable(GL11.GL_ALPHA_TEST);
-        mush.renderPart("Stem");
+        //mush.renderPart("Stem");
         GL11.glEnable(GL11.GL_ALPHA_TEST);
         GL11.glShadeModel(GL11.GL_FLAT);
 
