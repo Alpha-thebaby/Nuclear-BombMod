@@ -61,7 +61,18 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
         if (mush != null) {
             //ExampleMod.LOGGER.info("Rendering mushroom");
             matrices.push();
-            //matrices.translate(cloud.getX(), cloud.getY(), cloud.getZ());
+            float size = cloud.getDataTracker().get(EntityNukeCloudSmall.SCALE) * 5;
+            //Function that determines how high the cloud has risen. The values are the results of trial and error and i forgot what they mean
+            double height = Math.max(20 - 30 * 20 / ((((cloud.age + 0.0F) * 0.5) - 60 * 0.1) + 1), 0);
+            double expansion = 100;
+            float width = (float) (Math.min(cloud.age, expansion) / expansion * 0.3 + 0.7);
+
+            matrices.scale(size, size, size);
+
+
+            matrices.translate(0, -26 + height, 0);
+            matrices.scale(width, 1, width);
+
             MatrixStack.Entry entry = matrices.peek();
             VertexConsumer consumer = vertexConsumers.getBuffer(RenderLayer.getSolid());
             // scrolling texture
@@ -92,7 +103,7 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
         }
 
         //(cloud, partialTicks);
-        //cloudletWrapper(cloud, partialTicks);
+        cloudletWrapper(cloud, 0, matrices, vertexConsumers);
         flashWrapper(cloud, 0, matrices, vertexConsumers);
 
         //GL11.glPopMatrix();
@@ -227,10 +238,10 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
      * @param cloud
      * @param interp
      */
-    private void cloudletWrapper(EntityNukeCloudSmall cloud, float interp) {
+    private void cloudletWrapper(EntityNukeCloudSmall cloud, float interp, MatrixStack matrices, VertexConsumerProvider vertices) {
 
-        GL11.glPushMatrix();
-        GlStateManager._enableBlend();
+        //GL11.glPushMatrix();
+        //GlStateManager._enableBlend();
         //To prevent particles cutting off before fully fading out
         //Drillgon200: What'd the point of setting the alpha func if you're just going to disable the test anyway?
         // This contributes to my overall happiness.  - Random
@@ -243,16 +254,13 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
          */
 
         //bindTexture(cloudlet);
-
-        Tessellator tess = Tessellator.getInstance();
-        BufferBuilder buf = tess.getBuffer();
-        buf.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
+        matrices.push();
+        VertexConsumer buf = vertices.getBuffer(RenderLayer.getLightning());
 
         for(EntityNukeCloudSmall.Cloudlet cloudlet : cloud.cloudlets) {
             float scale = cloud.age + interp - cloudlet.age;
             tessellateCloudlet(buf, cloudlet.posX, cloudlet.posY - cloud.getY() + 2, cloudlet.posZ, scale, (int) cloud.getDataTracker().get(EntityNukeCloudSmall.TYPE));
         }
-        tess.draw();
 
     	/*Random rand = new Random(cloud.getEntityId());
     	float size = cloud.getDataWatcher().getWatchableObjectFloat(18);
@@ -265,12 +273,10 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
     		tessellateCloudlet(tess, vec.xCoord, (scale - vec.lengthVector()) * rand.nextDouble() * 0.5, vec.zCoord - 10, (float)(cloud.age * cloud.cloudletLife) / cloud.maxAge, cloud.getDataWatcher().getWatchableObjectByte(19));
     	}*/
 
-        GlStateManager._depthMask(true);
         //GlStateManager._enableAlpha();
         //RenderHelper.enableStandardItemLighting();
         //GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F);
-        GlStateManager._disableBlend();
-        GL11.glPopMatrix();
+        matrices.pop();
     }
 
     /*
@@ -407,7 +413,7 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
      * @param age The mush' age when the cloudlet was created
      * @param type DataWatcher byte #19 which differentiates between different mush types
      */
-    private void tessellateCloudlet(BufferBuilder buf, double posX, double posY, double posZ, float age, int type) {
+    private void tessellateCloudlet(VertexConsumer buf, double posX, double posY, double posZ, float age, int type) {
 
         float alpha = 1F - Math.max(age / (float)(EntityNukeCloudSmall.cloudletLife), 0F);
         float alphaorig = alpha;

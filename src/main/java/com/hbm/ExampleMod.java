@@ -1,5 +1,6 @@
 package com.hbm;
 
+import com.hbm.entity.EntityNukeExplosionMK4;
 import com.hbm.entity.effect.EntityNukeCloudSmall;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -24,7 +25,14 @@ public class ExampleMod implements ModInitializer {
 			Registries.ENTITY_TYPE,
 			new Identifier("hbm", "nuke_cloud_small"),
 			FabricEntityTypeBuilder.<EntityNukeCloudSmall>create(SpawnGroup.MISC, EntityNukeCloudSmall::new).dimensions(EntityDimensions.fixed(20.0f, 40.0f)).build()
+			);
+
+	public static final EntityType<EntityNukeExplosionMK4> NUKE_EXPLOSION_MK4 = Registry.register(
+			Registries.ENTITY_TYPE,
+			new Identifier("hbm", "nuke_explosion_mk4"),
+			FabricEntityTypeBuilder.<EntityNukeExplosionMK4>create(SpawnGroup.MISC, com.hbm.entity.EntityNukeExplosionMK4::new).dimensions(EntityDimensions.fixed(20.0f, 40.0f)).build()
 	);
+
 
 	@Override
 	public void onInitialize() {
