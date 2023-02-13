@@ -1,5 +1,6 @@
 package com.hbm.entity.effect;
 
+import com.hbm.ExampleMod;
 import com.hbm.interfaces.IConstantRenderer;
 import com.hbm.util.Vec3;
 import net.fabricmc.api.Environment;
@@ -50,6 +51,18 @@ public class EntityNukeCloudSmall extends Entity implements IConstantRenderer {
         this.ignoreCameraFrustum = true;
         this.age = 0;
         this.noClip = true;
+        setRenderDistanceMultiplier(5.0D);
+    }
+
+    public EntityNukeCloudSmall(World world, double x, double y, double z) {
+        super(ExampleMod.NUKE_COUD_SMALL, world);
+        // these are set in entity registry
+        //this.scale(20, 40);
+        //this.isImmuneToFire = true;
+        this.ignoreCameraFrustum = true;
+        this.age = 0;
+        this.noClip = true;
+        this.setPos(x, y, z);
         setRenderDistanceMultiplier(5.0D);
     }
 

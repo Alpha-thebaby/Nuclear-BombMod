@@ -1,16 +1,23 @@
 package com.hbm;
 
+import com.hbm.block.NukeBoyBlock;
 import com.hbm.entity.EntityNukeExplosionMK4;
 import com.hbm.entity.effect.EntityNukeCloudSmall;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
+import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
+import net.minecraft.block.Block;
+import net.minecraft.block.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
+import net.minecraft.item.BlockItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +40,8 @@ public class ExampleMod implements ModInitializer {
 			FabricEntityTypeBuilder.<EntityNukeExplosionMK4>create(SpawnGroup.MISC, com.hbm.entity.EntityNukeExplosionMK4::new).dimensions(EntityDimensions.fixed(20.0f, 40.0f)).build()
 	);
 
+	public static final Block NUKE_BOY = new NukeBoyBlock(FabricBlockSettings.of(Material.METAL).requiresTool().strength(2.0f).sounds(BlockSoundGroup.COPPER));
+
 
 	@Override
 	public void onInitialize() {
@@ -42,5 +51,8 @@ public class ExampleMod implements ModInitializer {
 
 		LOGGER.info("Hello Fabric world!");
 		//FabricDefaultAttributeRegistry.register(NUKE_COUD_SMALL, Entity.attributes);
+		Registry.register(Registries.BLOCK, new Identifier("hbm", "nuke_boy"), NUKE_BOY);
+		Registry.register(Registries.ITEM, new Identifier("hbm", "nuke_boy"), new BlockItem(NUKE_BOY, new FabricItemSettings()));
+
 	}
 }

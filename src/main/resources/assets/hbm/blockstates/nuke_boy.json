@@ -1,0 +1,9 @@
+{
+  "variants": {
+    "": [
+      {
+        "model": "hbm:block/nuke_boy"
+      }
+    ]
+  }
+}

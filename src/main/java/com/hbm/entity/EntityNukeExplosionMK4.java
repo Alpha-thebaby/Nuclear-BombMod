@@ -12,12 +12,12 @@ import net.minecraft.world.World;
 
 public class EntityNukeExplosionMK4 extends Entity {
     // Strength of the blast
-    public int strength = 50;
+    public int strength = 240;
     // How many rays should be created
     public int count = 50;
     // How many rays are calculated per tick
-    public int speed = 1;
-    public int length = 50;
+    public int speed = 10;
+    public int length = 25;
 
     public boolean mute = false;
 
@@ -28,6 +28,11 @@ public class EntityNukeExplosionMK4 extends Entity {
 
     public EntityNukeExplosionMK4(EntityType<? extends EntityNukeExplosionMK4> entityType, World world) {
         super(entityType, world);
+    }
+
+    public EntityNukeExplosionMK4(World world, double x, double y, double z) {
+        super(ExampleMod.NUKE_EXPLOSION_MK4, world);
+        this.setPos(x, y, z);
     }
 
     public EntityNukeExplosionMK4(EntityType<? extends EntityNukeExplosionMK4> entityType, World world, int strength, int count, int speed, int length) {

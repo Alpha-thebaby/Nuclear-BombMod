@@ -423,16 +423,17 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
         if(age < 3)
             alpha = age * 0.333F;
 
-        /*
-        float f1 = ActiveRenderInfo.getRotationX();
-        float f2 = ActiveRenderInfo.getRotationZ();
-        float f3 = ActiveRenderInfo.getRotationYZ();
-        float f4 = ActiveRenderInfo.getRotationXY();
-        float f5 = ActiveRenderInfo.getRotationXZ();
+        float f1 = this.dispatcher.getRotation().x();
+        float f2 = this.dispatcher.getRotation().z();
+        float f3 = this.dispatcher.getRotation().y();
+        float f4 = this.dispatcher.getRotation().x();
+        float f5 = this.dispatcher.getRotation().z();
 
-         */
+        /*
         float f1, f2, f3, f4, f5;
         f1 = f2 = f3 = f4 = f5 = 0;
+
+         */
 
 
         Random rand = Random.create();
@@ -452,9 +453,9 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
         }
         a = MathHelper.clamp(a, 0, 1);
         //.endVertex()
-        buf.vertex((double)(posX - f1 * scale - f3 * scale), (double)(posY - f5 * scale), (double)(posZ - f2 * scale - f4 * scale)).texture(1, 1).color(r, g, b, a);
-        buf.vertex((double)(posX - f1 * scale + f3 * scale), (double)(posY + f5 * scale), (double)(posZ - f2 * scale + f4 * scale)).texture(1, 0).color(r, g, b, a);
-        buf.vertex((double)(posX + f1 * scale + f3 * scale), (double)(posY + f5 * scale), (double)(posZ + f2 * scale + f4 * scale)).texture(0, 0).color(r, g, b, a);
-        buf.vertex((double)(posX + f1 * scale - f3 * scale), (double)(posY - f5 * scale), (double)(posZ + f2 * scale - f4 * scale)).texture(0, 1).color(r, g, b, a);
+        buf.vertex((double)(posX - f1 * scale - f3 * scale), (double)(posY - f5 * scale), (double)(posZ - f2 * scale - f4 * scale)).texture(1, 1).color(r, g, b, a).next();
+        buf.vertex((double)(posX - f1 * scale + f3 * scale), (double)(posY + f5 * scale), (double)(posZ - f2 * scale + f4 * scale)).texture(1, 0).color(r, g, b, a).next();
+        buf.vertex((double)(posX + f1 * scale + f3 * scale), (double)(posY + f5 * scale), (double)(posZ + f2 * scale + f4 * scale)).texture(0, 0).color(r, g, b, a).next();
+        buf.vertex((double)(posX + f1 * scale - f3 * scale), (double)(posY - f5 * scale), (double)(posZ + f2 * scale - f4 * scale)).texture(0, 1).color(r, g, b, a).next();
     }
 }
