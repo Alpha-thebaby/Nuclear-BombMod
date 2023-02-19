@@ -1,5 +1,3 @@
 # Minecraft nuclear bomb mod
 
-## 
-
-Craft an entire nuclear blast with parts that you place in 
+## Create an entire nuclear explosion by assembling parts.
