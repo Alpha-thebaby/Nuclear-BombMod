@@ -1,7 +1,6 @@
 package com.hbm.client.render;
 
 import com.hbm.entity.EntityNukeExplosionMK4;
-import com.hbm.entity.effect.EntityNukeCloudSmall;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.util.Identifier;

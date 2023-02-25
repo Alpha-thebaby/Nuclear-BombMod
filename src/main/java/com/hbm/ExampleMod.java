@@ -2,6 +2,7 @@ package com.hbm;
 
 import com.hbm.block.NukeBoyBlock;
 import com.hbm.entity.EntityNukeExplosionMK4;
+import com.hbm.entity.NuclearBombEntity;
 import com.hbm.entity.effect.EntityNukeCloudSmall;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
@@ -38,6 +39,12 @@ public class ExampleMod implements ModInitializer {
 			Registries.ENTITY_TYPE,
 			new Identifier("hbm", "nuke_explosion_mk4"),
 			FabricEntityTypeBuilder.<EntityNukeExplosionMK4>create(SpawnGroup.MISC, com.hbm.entity.EntityNukeExplosionMK4::new).dimensions(EntityDimensions.fixed(20.0f, 40.0f)).build()
+	);
+
+	public static final EntityType<NuclearBombEntity> NUCLEAR_BOMB = Registry.register(
+			Registries.ENTITY_TYPE,
+			new Identifier("hbm", "nuclear_bomb"),
+			FabricEntityTypeBuilder.<NuclearBombEntity>create(SpawnGroup.MISC, com.hbm.entity.NuclearBombEntity::new).dimensions(EntityDimensions.fixed(0.5f, 0.5f)).build()
 	);
 
 	public static final Block NUKE_BOY = new NukeBoyBlock(FabricBlockSettings.of(Material.METAL).requiresTool().strength(2.0f).sounds(BlockSoundGroup.COPPER));

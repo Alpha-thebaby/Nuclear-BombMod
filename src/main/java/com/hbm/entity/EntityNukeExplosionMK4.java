@@ -9,6 +9,13 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.world.World;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 public class EntityNukeExplosionMK4 extends Entity {
     // Strength of the blast
@@ -26,13 +33,18 @@ public class EntityNukeExplosionMK4 extends Entity {
 
     ExplosionNukeRay explosion;
 
+    //private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+
+
     public EntityNukeExplosionMK4(EntityType<? extends EntityNukeExplosionMK4> entityType, World world) {
         super(entityType, world);
+        this.ignoreCameraFrustum = true;
     }
 
     public EntityNukeExplosionMK4(World world, double x, double y, double z) {
         super(ExampleMod.NUKE_EXPLOSION_MK4, world);
         this.setPos(x, y, z);
+        //this.ignoreCameraFrustum = true;
     }
 
     public EntityNukeExplosionMK4(EntityType<? extends EntityNukeExplosionMK4> entityType, World world, int strength, int count, int speed, int length) {
@@ -41,6 +53,7 @@ public class EntityNukeExplosionMK4 extends Entity {
         this.count = count;
         this.speed = speed;
         this.length = length;
+        //this.ignoreCameraFrustum = true;
     }
 
     @Override
@@ -179,4 +192,21 @@ public class EntityNukeExplosionMK4 extends Entity {
         this.mute = true;
         return this;
     }
+
+    /*
+     * Animation Side
+
+
+    private final AnimatableInstanceCache cache = GeckoLibUtil.createInstanceCache(this);
+
+
+    public void registerControllers(AnimatableManager.ControllerRegistrar controllerRegistrar) {
+    }
+
+
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.cache;
+    }
+
+     */
 }
