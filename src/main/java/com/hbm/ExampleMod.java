@@ -47,7 +47,7 @@ public class ExampleMod implements ModInitializer {
 			FabricEntityTypeBuilder.<NuclearBombEntity>create(SpawnGroup.MISC, com.hbm.entity.NuclearBombEntity::new).dimensions(EntityDimensions.fixed(0.5f, 0.5f)).build()
 	);
 
-	public static final Block NUKE_BOY = new NukeBoyBlock(FabricBlockSettings.of(Material.METAL).requiresTool().strength(2.0f).sounds(BlockSoundGroup.COPPER));
+	public static final Block NUKE_BOY = new NukeBoyBlock(FabricBlockSettings.of(Material.METAL).requiresTool().strength(2.0f).sounds(BlockSoundGroup.COPPER).nonOpaque());
 
 
 	@Override
