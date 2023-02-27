@@ -78,11 +78,13 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
             // scrolling texture
             //matrices.translate(0, -(cloud.age) * 0.035, 0);
 
+
             Vector4f quads = entry.getPositionMatrix().transform(new Vector4f(0F, 0F, 0F, 0F));
             Vector3f normal = entry.getNormalMatrix().transform(new Vector3f(0F, 0F, 0F));
             //m = byteBuffer.getFloat(16);
             mush.getQuads(null, null, cloud.getWorld().random).forEach(quad -> {
-                consumer.quad(entry, quad, 1F, 1F, 1F, light, 0);
+                //consumer.quad(entry, quad, 1F, 1F, 1F, light, 0);
+                //consumer.texture(0.0F, (float)cloud.age/60);
                 /*
                     float m = 0;
                     float n = 0;
@@ -98,6 +100,58 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
                                 normal.x, normal.y, normal.z);
                     }
                  */
+                // Please do not do what I am about to do.
+                float[] fs = new float[]{1.0F, 1.0F, 1.0F, 1.0F};
+                int[] is = new int[]{light, light, light, light};
+                int[] js = quad.getVertexData();
+                Vec3i vec3i = quad.getFace().getVector();
+                Matrix4f matrix4f = entry.getPositionMatrix();
+                Vector3f vector3f = entry.getNormalMatrix().transform(new Vector3f((float)vec3i.getX(), (float)vec3i.getY(), (float)vec3i.getZ()));
+                //int i = true;
+                int j = js.length / 8;
+                MemoryStack memoryStack = MemoryStack.stackPush();
+
+                try {
+                    ByteBuffer byteBuffer = memoryStack.malloc(VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL.getVertexSizeByte());
+                    IntBuffer intBuffer = byteBuffer.asIntBuffer();
+
+                    for(int k = 0; k < j; ++k) {
+                        intBuffer.clear();
+                        intBuffer.put(js, k * 8, 8);
+                        float f = byteBuffer.getFloat(0);
+                        float g = byteBuffer.getFloat(4);
+                        float h = byteBuffer.getFloat(8);
+                        float o;
+                        float p;
+                        float q;
+                        float m;
+                        float n;
+
+                        o = fs[k] * 1;
+                        p = fs[k] * 1;
+                        q = fs[k] * 1;
+
+                        int r = is[k];
+                        m = byteBuffer.getFloat(16);
+                        n = byteBuffer.getFloat(20) + 0.25F - (float)cloud.age/60;
+                        Vector4f vector4f = matrix4f.transform(new Vector4f(f, g, h, 1.0F));
+                        consumer.vertex(vector4f.x(), vector4f.y(), vector4f.z(), o, p, q, 1.0F, m, n, 0, r, vector3f.x(), vector3f.y(), vector3f.z());
+                    }
+                } catch (Throwable var33) {
+                    if (memoryStack != null) {
+                        try {
+                            memoryStack.close();
+                        } catch (Throwable var32) {
+                            var33.addSuppressed(var32);
+                        }
+                    }
+
+                    throw var33;
+                }
+
+                if (memoryStack != null) {
+                    memoryStack.close();
+                }
                 });
             matrices.pop();
         }
