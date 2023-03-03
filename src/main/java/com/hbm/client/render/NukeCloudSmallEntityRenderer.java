@@ -133,7 +133,8 @@ public class NukeCloudSmallEntityRenderer extends EntityRenderer<EntityNukeCloud
 
                         int r = is[k];
                         m = byteBuffer.getFloat(16);
-                        n = byteBuffer.getFloat(20) + 0.25F - (float)cloud.age/60;
+                        n = byteBuffer.getFloat(20);// + 0.25F + (float)cloud.age/60;
+                        n = (n % 1);
                         Vector4f vector4f = matrix4f.transform(new Vector4f(f, g, h, 1.0F));
                         consumer.vertex(vector4f.x(), vector4f.y(), vector4f.z(), o, p, q, 1.0F, m, n, 0, r, vector3f.x(), vector3f.y(), vector3f.z());
                     }
